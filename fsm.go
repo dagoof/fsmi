@@ -1,3 +1,7 @@
+// Package fsmi exposes a method of working with FSM's through interfaces rather
+// than concrete state structs. By satisfying the State interface and using the
+// Transition function, it is possible to have arbitrary types act behave as FSM
+// states without embedding State structs everywhere and cluttering your types.
 package fsmi
 
 import (

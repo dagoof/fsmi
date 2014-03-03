@@ -1,13 +1,18 @@
-package fsm
+package fsmi
 
 import (
 	"fmt"
 )
 
+// State is a type meant to be declared in an iota and used as an enum to mark
+// transitions between machines.
 type State int64
+
+// States is a slice of states
 type States []State
 
-type Machine interface {
+// Machine is an interface that describes one part of a 
+type Node interface {
 	Current() State
 	ToStates() States
 	Transition(State) Machine

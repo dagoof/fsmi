@@ -1,6 +1,7 @@
-package fsm
+package fsmi
 
 import (
+	"testing"
 	"fmt"
 )
 
@@ -42,37 +43,92 @@ func (p *Phone) Transition(target State) Machine {
 	return p
 }
 
-func ExampleMachine() {
+func TestMachine(t *testing.T) {
 	var phone Machine = &Phone{Nothing}
+	var next State
 	var err error
 
-	phone, err = Transition(phone, Ringing)
-	fmt.Println(phone.Current(), err)
+	next = Ringing
+	phone, err = Transition(phone, next)
+	if err != nil {
+		t.Error(err)
+	}
+	if phone.Current() != next {
+		t.Errorf("phone state should be %d, not %d", next, phone.Current())
+	}
 
-	phone, err = Transition(phone, Ringing)
-	fmt.Println(phone.Current(), err)
+	next = Ringing
+	phone, err = Transition(phone, next)
+	if err == nil {
+		t.Error(err)
+	}
 
-	phone, err = Transition(phone, AnsweringMachine)
-	fmt.Println(phone.Current(), err)
+	next = AnsweringMachine
+	phone, err = Transition(phone, next)
+	if err != nil {
+		t.Error(err)
+	}
+	if phone.Current() != next {
+		t.Errorf("phone state should be %d, not %d", next, phone.Current())
+	}
 
-	phone, err = Transition(phone, PickedUp)
-	fmt.Println(phone.Current(), err)
+	next = PickedUp
+	phone, err = Transition(phone, next)
+	if err != nil {
+		t.Error(err)
+	}
+	if phone.Current() != next {
+		t.Errorf("phone state should be %d, not %d", next, phone.Current())
+	}
 
-	phone, err = Transition(phone, Talking)
-	fmt.Println(phone.Current(), err)
+	next = Talking
+	phone, err = Transition(phone, next)
+	if err != nil {
+		t.Error(err)
+	}
+	if phone.Current() != next {
+		t.Errorf("phone state should be %d, not %d", next, phone.Current())
+	}
 
-	phone, err = Transition(phone, HungUp)
-	fmt.Println(phone.Current(), err)
+	next = HungUp
+	phone, err = Transition(phone, next)
+	if err != nil {
+		t.Error(err)
+	}
+	if phone.Current() != next {
+		t.Errorf("phone state should be %d, not %d", next, phone.Current())
+	}
 
-	phone, err = Transition(phone, Nothing)
-	fmt.Println(phone.Current(), err)
+	next = Nothing
+	phone, err = Transition(phone, next)
+	if err == nil {
+		t.Error(err)
+	}
+	if phone.Current() == next {
+		t.Errorf("phone state should be not have progressed to %d", next)
+	}
 
-	// Output:
-	// 1 <nil>
-	// 1 could not transition from state 1 to 1
-	// 4 <nil>
-	// 2 <nil>
-	// 3 <nil>
-	// 5 <nil>
-	// 5 could not transition from state 5 to 0
 }
+
+// Essentially duplicates the above test but with output for godoc. Without the
+// above test, godoc writes out all the Phone implementation.
+func ExampleMachine() {
+	var phone Machine = &Phone{Nothing}
+
+	fmt.Println(Transition(phone, Ringing))
+	fmt.Println(Transition(phone, Ringing))
+	fmt.Println(Transition(phone, AnsweringMachine))
+	fmt.Println(Transition(phone, PickedUp))
+	fmt.Println(Transition(phone, Talking))
+	fmt.Println(Transition(phone, HungUp))
+	fmt.Println(Transition(phone, Nothing))
+	// Output:
+	// &{1} <nil>
+	// &{1} could not transition from state 1 to 1
+	// &{4} <nil>
+	// &{2} <nil>
+	// &{3} <nil>
+	// &{5} <nil>
+	// &{5} could not transition from state 5 to 0
+}
+

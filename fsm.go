@@ -7,31 +7,19 @@ import (
 type State int64
 type States []State
 
-type MachineMaker func() (Machine, error)
-
 type Machine interface {
-	Set(State)
 	Current() State
 	ToStates() States
-	TransitionTo(State) MachineMaker
+	Transition(State) Machine
 }
+
+type MachineMaker func(Machine) Machine
 
 func Transition(m Machine, target State) (Machine, error) {
 	if CanTransition(m, target) {
-		return m.TransitionTo(target)()
+		return m.Transition(target), nil
 	}
 	return m, TransitionError{m.Current(), target}
-}
-
-
-func Self(m Machine, target State) MachineMaker {
-	return func() (Machine, error) {
-		if CanTransition(m, target) {
-			m.Set(target)
-			return m, nil
-		}
-		return m, TransitionError{m.Current(), target}
-	}
 }
 
 func CanTransition(m Machine, target State) bool {
@@ -49,5 +37,5 @@ type TransitionError struct {
 }
 
 func (t TransitionError) Error() string {
-	return fmt.Sprintf("could not transition from %s to %s", t.From, t.To)
+	return fmt.Sprintf("could not transition from state %d to %d", t.From, t.To)
 }

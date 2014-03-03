@@ -37,26 +37,42 @@ func (p *Phone) ToStates() States {
 	return States{}
 }
 
-func (p *Phone) Set(target State) {
+func (p *Phone) Transition(target State) Machine {
 	p.State = target
+	return p
 }
 
-func (p *Phone) TransitionTo(target State) MachineMaker {
-	return Self(p, target)
-}
+func ExampleMachine() {
+	var phone Machine = &Phone{Nothing}
+	var err error
 
-func ExampleSimple() {
-	var phone Phone
+	phone, err = Transition(phone, Ringing)
+	fmt.Println(phone.Current(), err)
 
-	fmt.Println(phone)
+	phone, err = Transition(phone, Ringing)
+	fmt.Println(phone.Current(), err)
 
-	fmt.Println(Transition(&phone, Ringing))
-	fmt.Println(Transition(&phone, Ringing))
-	fmt.Println(Transition(&phone, PickedUp))
-	fmt.Println(Transition(&phone, Ringing))
-	fmt.Println(Transition(&phone, Talking))
-	fmt.Println(Transition(&phone, HungUp))
+	phone, err = Transition(phone, AnsweringMachine)
+	fmt.Println(phone.Current(), err)
+
+	phone, err = Transition(phone, PickedUp)
+	fmt.Println(phone.Current(), err)
+
+	phone, err = Transition(phone, Talking)
+	fmt.Println(phone.Current(), err)
+
+	phone, err = Transition(phone, HungUp)
+	fmt.Println(phone.Current(), err)
+
+	phone, err = Transition(phone, Nothing)
+	fmt.Println(phone.Current(), err)
 
 	// Output:
-	// A
+	// 1 <nil>
+	// 1 could not transition from state 1 to 1
+	// 4 <nil>
+	// 2 <nil>
+	// 3 <nil>
+	// 5 <nil>
+	// 5 could not transition from state 5 to 0
 }

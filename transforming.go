@@ -12,12 +12,12 @@ func (t *Transforming) Current() State {
 func (t *Transforming) ToStates() States {
 	var states States
 
-	for _, state := range t.To {
+	for state := range t.To {
 		states = append(states, state)
 	}
 	return states
 }
 
-func (t *Transforming) TransitionTo(target State) MachineMaker {
-	return t.To[target]
+func (t *Transforming) Transition(target State) Machine {
+	return t.To[target](t)
 }

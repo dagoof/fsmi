@@ -4,31 +4,37 @@ import (
 	"fmt"
 )
 
-// State is a type meant to be declared in an iota and used as an enum to mark
-// transitions between machines.
-type State int64
+// ID is a type meant to be declared in an iota and used as an enum to mark
+// unique states
+type ID int64
 
-// States is a slice of states
-type States []State
+// IDs is a slice of ID
+type IDs []ID
 
-// Machine is an interface that describes one part of a 
-type Node interface {
-	Current() State
-	ToStates() States
-	Transition(State) Machine
+// State is an interface that describes one part of a fsm. It is identified by
+// a current ID, and can be queried for a slice of IDs that are available to
+// transition to. The Transition method of this type should not guard against
+// incorrect transitions; rather let that logic be done by the `fsm.Transition`
+// function, which will emit an error if the transition cannot be carried out.
+type State interface {
+	Current() ID
+	Available() IDs
+	Transition(ID) State
 }
 
-type MachineMaker func(Machine) Machine
-
-func Transition(m Machine, target State) (Machine, error) {
-	if CanTransition(m, target) {
-		return m.Transition(target), nil
+// Transition attempts to transition a state to a new state supplied by the ID,
+// if that transition itself is acceptable by the current state.
+func Transition(s State, target ID) (State, error) {
+	if CanTransition(s, target) {
+		return s.Transition(target), nil
 	}
-	return m, TransitionError{m.Current(), target}
+	return s, TransitionError{s.Current(), target}
 }
 
-func CanTransition(m Machine, target State) bool {
-	for _, available := range m.ToStates() {
+// CanTransition determines whether a given transition is acceptable by looking
+// through the slice of available IDs on the current state.
+func CanTransition(s State, target ID) bool {
+	for _, available := range s.Available() {
 		if target == available {
 			return true
 		}
@@ -37,8 +43,10 @@ func CanTransition(m Machine, target State) bool {
 	return false
 }
 
+// TransitionError is the error type given off if a transition cannot be carried
+// out.
 type TransitionError struct {
-	From, To State
+	From, To ID
 }
 
 func (t TransitionError) Error() string {

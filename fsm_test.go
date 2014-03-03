@@ -1,12 +1,12 @@
 package fsmi
 
 import (
-	"testing"
 	"fmt"
+	"testing"
 )
 
 const (
-	Nothing State = iota
+	Nothing ID = iota
 	Ringing
 	PickedUp
 	Talking
@@ -15,37 +15,37 @@ const (
 )
 
 type Phone struct {
-	State
+	ID
 }
 
-func (p *Phone) Current() State {
-	return p.State
+func (p *Phone) Current() ID {
+	return p.ID
 }
 
-func (p *Phone) ToStates() States {
+func (p *Phone) Available() IDs {
 	switch p.Current() {
 	case Nothing:
-		return States{Ringing}
+		return IDs{Ringing}
 	case Ringing:
-		return States{PickedUp, AnsweringMachine}
+		return IDs{PickedUp, AnsweringMachine}
 	case PickedUp:
-		return States{Talking}
+		return IDs{Talking}
 	case Talking:
-		return States{HungUp}
+		return IDs{HungUp}
 	case AnsweringMachine:
-		return States{PickedUp, HungUp}
+		return IDs{PickedUp, HungUp}
 	}
-	return States{}
+	return IDs{}
 }
 
-func (p *Phone) Transition(target State) Machine {
-	p.State = target
+func (p *Phone) Transition(target ID) State {
+	p.ID = target
 	return p
 }
 
-func TestMachine(t *testing.T) {
-	var phone Machine = &Phone{Nothing}
-	var next State
+func TestState(t *testing.T) {
+	var phone State = &Phone{Nothing}
+	var next ID
 	var err error
 
 	next = Ringing
@@ -112,8 +112,8 @@ func TestMachine(t *testing.T) {
 
 // Essentially duplicates the above test but with output for godoc. Without the
 // above test, godoc writes out all the Phone implementation.
-func ExampleMachine() {
-	var phone Machine = &Phone{Nothing}
+func ExampleState() {
+	var phone State = &Phone{Nothing}
 
 	fmt.Println(Transition(phone, Ringing))
 	fmt.Println(Transition(phone, Ringing))
@@ -131,4 +131,3 @@ func ExampleMachine() {
 	// &{5} <nil>
 	// &{5} could not transition from state 5 to 0
 }
-

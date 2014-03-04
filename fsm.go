@@ -18,7 +18,7 @@ type IDs []ID
 // State is an interface that describes one part of a fsm. It is identified by
 // a current ID, and can be queried for a slice of IDs that are available to
 // transition to. The Transition method of this type should not guard against
-// incorrect transitions; rather let that logic be done by the `fsm.Transition`
+// incorrect transitions; rather let that logic be done by the fsm.Transition
 // function, which will emit an error if the transition cannot be carried out.
 type State interface {
 	Current() ID

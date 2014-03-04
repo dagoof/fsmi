@@ -110,8 +110,8 @@ func TestState(t *testing.T) {
 
 }
 
-// Essentially duplicates the above test but with output for godoc. Without the
-// above test, godoc writes out all the Phone implementation.
+// See fsm_test.go for the Available method on Phone which defines the available
+// transitions for any current state of Phone.
 func ExampleState() {
 	var phone State = &Phone{Nothing}
 

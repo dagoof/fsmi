@@ -18,28 +18,28 @@ type Phone struct {
 	ID
 }
 
-func (p *Phone) Current() ID {
+func (p *Phone) Current() Identifier {
 	return p.ID
 }
 
-func (p *Phone) Available() IDs {
+func (p *Phone) Available() []Identifier {
 	switch p.Current() {
 	case Nothing:
-		return IDs{Ringing}
+		return []Identifier{Ringing}
 	case Ringing:
-		return IDs{PickedUp, AnsweringMachine}
+		return []Identifier{PickedUp, AnsweringMachine}
 	case PickedUp:
-		return IDs{Talking}
+		return []Identifier{Talking}
 	case Talking:
-		return IDs{HungUp}
+		return []Identifier{HungUp}
 	case AnsweringMachine:
-		return IDs{PickedUp, HungUp}
+		return []Identifier{PickedUp, HungUp}
 	}
-	return IDs{}
+	return []Identifier{}
 }
 
-func (p *Phone) Transition(target ID) State {
-	p.ID = target
+func (p *Phone) Transition(target Identifier) State {
+	p.ID = ID(target.Identity())
 	return p
 }
 

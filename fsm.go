@@ -27,21 +27,29 @@ type Identifier interface {
 
 // State is an interface that describes one part of a fsm. It is identified by
 // an Identifier, and can be queried for a slice of Identifiers that are
-// available to transition to. The Transition method of this type should not
-// guard against incorrect transitions; rather let that logic be done by the
-// fsm.Transition function, which will emit an error if the transition
-// cannot be carried out.
+// available to transition to.
 type State interface {
 	Current() Identifier
 	Available() []Identifier
-	Transition(Identifier) State
 }
 
-// Transition attempts to transition a state to a new state supplied by the
-// Identifier, if that transition itself is acceptable by the current state.
-func Transition(s State, target Identifier) (State, error) {
+// Transitioner is an interface that describes a state that is able to
+// transition to other states. The Transition method of this type should not
+// guard against incorrect transitions; rather let that logic be done by the
+// fsm.Transition function, which will emit an error if the transition
+// cannot be carried out.
+type Transitioner interface {
+	State
+	Transition(Identifier) (Transitioner, error)
+}
+
+// Transition attempts to transition a Transitioner to a new state indicated by
+// the given Identifier, if that transition itself is acceptable by the
+// current state. If inappropriate, a TransitionError will be given with
+// information about the transition that was attempted.
+func Transition(s Transitioner, target Identifier) (Transitioner, error) {
 	if CanTransition(s, target) {
-		return s.Transition(target), nil
+		return s.Transition(target)
 	}
 	return s, TransitionError{s.Current(), target}
 }

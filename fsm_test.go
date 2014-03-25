@@ -38,13 +38,13 @@ func (p *Phone) Available() []Identifier {
 	return []Identifier{}
 }
 
-func (p *Phone) Transition(target Identifier) State {
+func (p *Phone) Transition(target Identifier) (Transitioner, error) {
 	p.ID = ID(target.Identity())
-	return p
+	return p, nil
 }
 
 func TestState(t *testing.T) {
-	var phone State = &Phone{Nothing}
+	var phone Transitioner = &Phone{Nothing}
 	var next ID
 	var err error
 
@@ -113,7 +113,7 @@ func TestState(t *testing.T) {
 // See fsm_test.go for the Available method on Phone which defines the available
 // transitions for any current state of Phone.
 func ExampleState() {
-	var phone State = &Phone{Nothing}
+	var phone Transitioner = &Phone{Nothing}
 
 	fmt.Println(Transition(phone, Ringing))
 	fmt.Println(Transition(phone, Ringing))
